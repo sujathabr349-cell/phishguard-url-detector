@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}URL Scanner – PhishGuard AI{% endblock %}
+{% block page_title %}URL Scanner{% endblock %}
+
+{% block content %}
+<div class="scanner-hero">
+    <div class="hero-header">
+        <h1 class="hero-title">Phishing URL Detection & Structural Risk Analysis</h1>
+        <p class="hero-subtitle">
+            Inspect suspicious links before opening. Evaluates 12+ lexical and architectural indicators including homoglyphs, IP hostnames, URL shorteners, and brand impersonation lures.
+        </p>
+    </div>
+
+    <!-- Prominent Scanning Form -->
+    <div class="scanner-card">
+        <form id="scanForm" action="{{ url_for('scan') }}" method="POST" class="scan-form">
+            <div class="input-wrapper">
+                <div class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                </div>
+                <input 
+                    type="url" 
+                    id="urlInput"
+                    name="url" 
+                    class="url-input"
+                    placeholder="https://example.com/login or paste suspicious link..." 
+                    value="{{ url_input or '' }}" 
+                    required 
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+                <button type="submit" id="submitScanBtn" class="btn btn-primary">
+                    <span class="btn-text">Analyze URL</span>
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </button>
+            </div>
+            <div class="form-helper">
+                <span>Accepted formats: Standard <code>http://</code> and <code>https://</code> web addresses up to 2,048 characters.</span>
+                <span class="safe-badge">Safe execution: PhishGuard never visits or downloads the remote destination.</span>
+            </div>
+        </form>
+
+        <!-- Dynamic Animated Scan Progress Indicator (Displayed via JS upon submission) -->
+        <div id="scanProgressContainer" class="scan-progress-container" style="display: none;">
+            <div class="scan-pipeline">
+                <div class="pipeline-step" id="stepParse">
+                    <div class="step-dot"></div>
+                    <span class="step-label">1. Syntax & Scheme Parse</span>
+                </div>
+                <div class="pipeline-step" id="stepFeatures">
+                    <div class="step-dot"></div>
+                    <span class="step-label">2. Extract Lexical Signals</span>
+                </div>
+                <div class="pipeline-step" id="stepHeuristics">
+                    <div class="step-dot"></div>
+                    <span class="step-label">3. Heuristic Weighting</span>
+                </div>
+                <div class="pipeline-step" id="stepML">
+                    <div class="step-dot"></div>
+                    <span class="step-label">4. ML Probability Check</span>
+                </div>
+            </div>
+            <div class="progress-bar-track">
+                <div id="progressBarFill" class="progress-bar-fill"></div>
+            </div>
+            <p id="progressStatusText" class="progress-status-text">Deconstructing hostname and lexical structure...</p>
+        </div>
+
+        <!-- Sample Demonstration URLs for Quick Testing -->
+        <div class="sample-urls-section">
+            <span class="sample-label">Try test samples:</span>
+            <div class="sample-chips">
+                <button type="button" class="sample-btn" data-url="http://paypal-security-update.account-verify.xyz/login">
+                    Suspicious Phish Lure
+                </button>
+                <button type="button" class="sample-btn" data-url="http://192.168.1.105/auth/secure-login.php">
+                    Direct IP Host
+                </button>
+                <button type="button" class="sample-btn" data-url="http://bit.ly/3xFakeBankLogin">
+                    Masked Shortener
+                </button>
+                <button type="button" class="sample-btn" data-url="https://www.wikipedia.org/wiki/Computer_security">
+                    Standard Benign URL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Pillars Grid -->
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+            </div>
+            <h3 class="feature-heading">Transparent Heuristics</h3>
+            <p class="feature-desc">Every deducted point is attributed to documented threat signals including IP hosting, punycode lookalikes, and authentication lure strings.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/><path d="M2 12h20"/><path d="m5 7 3 5-3 5"/><path d="m19 7-3 5 3 5"/></svg>
+            </div>
+            <h3 class="feature-heading">Random Forest ML</h3>
+            <p class="feature-desc">Trained Scikit-learn classifier evaluates multi-dimensional feature distributions trained against legitimate and phishing corpuses.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h3 class="feature-heading">Zero Outbound Fetch</h3>
+            <p class="feature-desc">Complete SSRF mitigation. PhishGuard analyzes URL syntax without initiating HTTP socket connections to malicious targets.</p>
+        </div>
+    </div>
+
+    <!-- Recent Scans Quick Table -->
+    {% if recent_scans %}
+    <div class="recent-scans-card">
+        <div class="card-header-flex">
+            <div>
+                <h3 class="card-title">Recent URL Inquiries</h3>
+                <p class="card-subtitle">Last 5 submissions recorded in SQLite</p>
+            </div>
+            <a href="{{ url_for('history') }}" class="text-link">View all history &rarr;</a>
+        </div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Analyzed URL</th>
+                        <th>Domain</th>
+                        <th>Risk Score</th>
+                        <th>Assessment</th>
+                        <th>Timestamp</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for scan in recent_scans %}
+                    <tr>
+                        <td class="cell-url truncate-url" title="{{ scan.url }}">{{ scan.url }}</td>
+                        <td class="cell-domain font-mono">{{ scan.domain }}</td>
+                        <td class="cell-score font-mono tabular-nums">{{ scan.risk_score }}/100</td>
+                        <td>
+                            <span class="risk-badge risk-{{ scan.risk_level | lower }}">{{ scan.risk_level }}</span>
+                        </td>
+                        <td class="cell-time font-mono">{{ scan.created_at }}</td>
+                        <td>
+                            <a href="{{ url_for('result', scan_id=scan.id) }}" class="btn-table">Inspect</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

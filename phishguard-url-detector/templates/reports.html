@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Threat Reports & Visual Analytics – PhishGuard AI{% endblock %}
+{% block page_title %}Security Reports{% endblock %}
+
+{% block content %}
+<div class="reports-container">
+    <div class="section-header-row">
+        <div>
+            <h1 class="page-main-heading">Cybersecurity Analytics & Indicator Reports</h1>
+            <p class="page-subheading">In-depth statistical reporting, temporal trend distributions, and warning vector frequencies.</p>
+        </div>
+        <div class="header-action-group">
+            <a href="{{ url_for('export_csv') }}" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                <span>Download CSV Audit Log</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Aggregate Overview Cards -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-title">Total Records</div>
+            <div class="metric-value tabular-nums">{{ stats.total_scans }}</div>
+            <div class="metric-sub">Analyzed to date</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Suspicious Total</div>
+            <div class="metric-value tabular-nums text-crimson">{{ stats.suspicious_total }}</div>
+            <div class="metric-sub">High & Medium risk flags</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Average Threat Score</div>
+            <div class="metric-value tabular-nums text-cyan">{{ stats.avg_risk_score }}/100</div>
+            <div class="metric-sub">Overall risk index</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Benign Ratio</div>
+            <div class="metric-value tabular-nums text-teal">
+                {% if stats.total_scans > 0 %}
+                    {{ ((stats.low_risk / stats.total_scans) * 100) | round(1) }}%
+                {% else %}
+                    0%
+                {% endif %}
+            </div>
+            <div class="metric-sub">Low risk proportions</div>
+        </div>
+    </div>
+
+    <!-- Visualization Grid -->
+    <div class="reports-charts-grid">
+        <!-- Temporal Trend Line Chart -->
+        <div class="chart-card">
+            <div class="card-header-flex">
+                <div>
+                    <h3 class="card-title">14-Day Submission & Threat Velocity</h3>
+                    <p class="card-subtitle">Volume of scanned URLs segregated by classification level</p>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="reportsTrendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Risk Distribution Donut -->
+        <div class="chart-card">
+            <div class="card-header-flex">
+                <div>
+                    <h3 class="card-title">Threat Stratification Breakdown</h3>
+                    <p class="card-subtitle">Proportionate composition of inspected endpoints</p>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="reportsDistChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Frequency of Threat Vectors Horizontal Bar Chart -->
+        <div class="chart-card full-width-chart">
+            <div class="card-header-flex">
+                <div>
+                    <h3 class="card-title">Top Detected Threat Indicators</h3>
+                    <p class="card-subtitle">Most frequently triggered structural anomalies and phishing vectors</p>
+                </div>
+            </div>
+            <div class="chart-wrapper-tall">
+                <canvas id="reportsIndicatorsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Indicator Summary Table -->
+    <div class="card indicator-summary-card">
+        <h3 class="card-title">Indicator Hit Frequency Table</h3>
+        <p class="card-subtitle">Detailed breakdown of architectural detection triggers</p>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Threat Signal Characteristic</th>
+                        <th>Severity Baseline</th>
+                        <th>Total Detection Hits</th>
+                        <th>Relative Occurrence</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for name, count in indicators.items() %}
+                    <tr>
+                        <td class="font-semibold">{{ name }}</td>
+                        <td>
+                            {% if 'IP' in name or 'Keywords' in name or 'Homoglyph' in name %}
+                                <span class="risk-badge risk-high">High</span>
+                            {% elif 'HTTPS' in name or 'Shortener' in name or 'Port' in name %}
+                                <span class="risk-badge risk-medium">Medium</span>
+                            {% else %}
+                                <span class="risk-badge risk-low">Low</span>
+                            {% endif %}
+                        </td>
+                        <td class="font-mono tabular-nums">{{ count }}</td>
+                        <td class="font-mono tabular-nums">
+                            {% if stats.total_scans > 0 %}
+                                {{ ((count / stats.total_scans) * 100) | round(1) }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const reportData = {
+        stats: {{ stats | tojson | safe }},
+        indicators: {{ indicators | tojson | safe }},
+        trends: {{ trends | tojson | safe }}
+    };
+</script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}

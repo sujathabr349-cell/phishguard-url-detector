@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Operations Dashboard – PhishGuard AI{% endblock %}
+{% block page_title %}Security Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="section-header-row">
+        <div>
+            <h1 class="page-main-heading">Cybersecurity Telemetry & Threat Metrics</h1>
+            <p class="page-subheading">Aggregated performance and classification distribution compiled directly from the SQLite database.</p>
+        </div>
+        <div class="header-action-group">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <span>Quick Scan</span>
+            </a>
+            <a href="{{ url_for('export_csv') }}" class="btn btn-secondary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                <span>Export CSV</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Stat Cards Metric Grid -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-title">Total URLs Analyzed</div>
+            <div class="metric-value tabular-nums">{{ stats.total_scans }}</div>
+            <div class="metric-sub">Stored in local database</div>
+        </div>
+        <div class="metric-card metric-high">
+            <div class="metric-title">High Risk URLs</div>
+            <div class="metric-value tabular-nums text-crimson">{{ stats.high_risk }}</div>
+            <div class="metric-sub">Score &ge; 70 (Critical lures)</div>
+        </div>
+        <div class="metric-card metric-med">
+            <div class="metric-title">Medium Suspicion</div>
+            <div class="metric-value tabular-nums text-amber">{{ stats.medium_risk }}</div>
+            <div class="metric-sub">Score 36–69 (Anomalies detected)</div>
+        </div>
+        <div class="metric-card metric-low">
+            <div class="metric-title">Lower Risk URLs</div>
+            <div class="metric-value tabular-nums text-teal">{{ stats.low_risk }}</div>
+            <div class="metric-sub">Score &lt; 36 (Conforming structure)</div>
+        </div>
+    </div>
+
+    <!-- Visual Charts Row -->
+    <div class="charts-row">
+        <!-- Daily Scan Activity Chart -->
+        <div class="chart-card flex-2">
+            <div class="card-header-flex">
+                <div>
+                    <h3 class="card-title">7-Day Threat Assessment Volume</h3>
+                    <p class="card-subtitle">Daily count of verified submissions and risk stratification</p>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Risk Distribution Donut Chart -->
+        <div class="chart-card flex-1">
+            <div class="card-header-flex">
+                <div>
+                    <h3 class="card-title">Classification Ratio</h3>
+                    <p class="card-subtitle">Breakdown across risk categories</p>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="distributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Scans Table Section -->
+    <div class="card recent-table-card">
+        <div class="card-header-flex">
+            <div>
+                <h3 class="card-title">Recent Inspection Log</h3>
+                <p class="card-subtitle">Real-time records logged to SQLite</p>
+            </div>
+            <a href="{{ url_for('history') }}" class="btn btn-secondary-sm">View Full History</a>
+        </div>
+
+        {% if recent_scans %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Submitted URL</th>
+                        <th>Extracted Hostname</th>
+                        <th>Risk Score</th>
+                        <th>Risk Classification</th>
+                        <th>HTTPS</th>
+                        <th>Timestamp</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for scan in recent_scans %}
+                    <tr>
+                        <td class="cell-url truncate-url" title="{{ scan.url }}">{{ scan.url }}</td>
+                        <td class="font-mono text-cyan">{{ scan.domain }}</td>
+                        <td class="font-mono tabular-nums font-semibold">{{ scan.risk_score }}/100</td>
+                        <td>
+                            <span class="risk-badge risk-{{ scan.risk_level | lower }}">{{ scan.risk_level }}</span>
+                        </td>
+                        <td>
+                            {% if scan.is_https %}
+                                <span class="badge-plain text-teal">TLS / HTTPS</span>
+                            {% else %}
+                                <span class="badge-plain text-amber">Plain HTTP</span>
+                            {% endif %}
+                        </td>
+                        <td class="font-mono text-muted text-xs">{{ scan.created_at }}</td>
+                        <td>
+                            <a href="{{ url_for('result', scan_id=scan.id) }}" class="btn-table">Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+            </div>
+            <h4 class="empty-title">No Scan Records Available</h4>
+            <p class="empty-desc">Your database currently holds zero scan history records. Start by analyzing a URL above.</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Scan Your First URL</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Injected JSON data from Flask backend
+    const dashboardData = {
+        highRisk: {{ stats.high_risk }},
+        mediumRisk: {{ stats.medium_risk }},
+        lowRisk: {{ stats.low_risk }},
+        trends: {{ trend_data | tojson | safe }}
+    };
+</script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}

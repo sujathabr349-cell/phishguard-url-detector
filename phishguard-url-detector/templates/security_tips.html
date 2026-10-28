@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Security Education & Defense Guide – PhishGuard AI{% endblock %}
+{% block page_title %}Security Education{% endblock %}
+
+{% block content %}
+<div class="education-container">
+    <div class="section-header-row">
+        <div>
+            <h1 class="page-main-heading">Phishing Defense & Digital Safety Guide</h1>
+            <p class="page-subheading">Practical cybersecurity knowledge to help you recognize deceptive links and safeguard personal and organization data.</p>
+        </div>
+    </div>
+
+    <!-- Educational Topic Cards Grid -->
+    <div class="education-grid">
+        <!-- Module 1 -->
+        <article class="edu-card">
+            <div class="edu-card-header">
+                <div class="edu-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+                </div>
+                <h3 class="edu-title">1. How Modern Phishing Operates</h3>
+            </div>
+            <p class="edu-text">
+                Phishing is social engineering where adversaries disguise themselves as trusted institutions—banks, email providers, tech giants, delivery carriers, or government agencies.
+            </p>
+            <ul class="edu-bullets">
+                <li><strong>Psychological Triggers:</strong> Messages manufacture artificial urgency ("Account suspended in 24 hours!", "Unauthorized transfer detected!").</li>
+                <li><strong>Credential Harvesters:</strong> Fake replica portals designed pixel-for-pixel to steal usernames, passwords, and 2FA tokens.</li>
+                <li><strong>Delivery Vectors:</strong> Distributed through spear-phishing emails, SMS text messages (smishing), QR codes (quishing), and social media messages.</li>
+            </ul>
+        </article>
+
+        <!-- Module 2 -->
+        <article class="edu-card">
+            <div class="edu-card-header">
+                <div class="edu-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <h3 class="edu-title">2. Deconstructing Suspicious URLs</h3>
+            </div>
+            <p class="edu-text">
+                Understanding the anatomy of a URL is your first line of defense against deceptive web links:
+            </p>
+            <div class="url-breakdown-box">
+                <div class="anatomy-row">
+                    <span class="segment-part scheme">https://</span>
+                    <span class="segment-part subdomain">paypal.com.</span>
+                    <span class="segment-part deceptive-domain">verify-identity-login.xyz</span>
+                    <span class="segment-part path">/account/</span>
+                </div>
+                <div class="anatomy-legend">
+                    <span class="legend-item"><span class="color-dot text-amber">■</span> <strong>Actual Registered Domain:</strong> <code>verify-identity-login.xyz</code> (Attacker controlled)</span>
+                    <span class="legend-item"><span class="color-dot text-cyan">■</span> <strong>Deceptive Subdomain:</strong> <code>paypal.com</code> (Only a label prefix)</span>
+                </div>
+            </div>
+            <p class="edu-text-sub">
+                Always read hostnames from <strong>right to left</strong> from the first single forward slash back to the domain name. The registered domain sits immediately before the top-level domain (.com, .org, .xyz).
+            </p>
+        </article>
+
+        <!-- Module 3 -->
+        <article class="edu-card">
+            <div class="edu-card-header">
+                <div class="edu-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <h3 class="edu-title">3. The Myth: "HTTPS Means Safe"</h3>
+            </div>
+            <p class="edu-text">
+                A common misconception is that a padlock or <code>https://</code> proves a site is trustworthy.
+            </p>
+            <ul class="edu-bullets">
+                <li><strong>What HTTPS Actually Means:</strong> Traffic between your browser and that server is encrypted. Eavesdroppers on public Wi-Fi cannot read it.</li>
+                <li><strong>What HTTPS Does NOT Mean:</strong> It does NOT verify that the operator of the server is honest!</li>
+                <li><strong>Free Automated Certificates:</strong> Automated certificate authorities provide free SSL/TLS certificates to anyone, including phishing actors. Over 80% of active phishing sites now use HTTPS.</li>
+            </ul>
+        </article>
+
+        <!-- Module 4 -->
+        <article class="edu-card">
+            <div class="edu-card-header">
+                <div class="edu-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" x2="2" y1="8" y2="22"/><line x1="17.5" x2="9" y1="15" y2="15"/></svg>
+                </div>
+                <h3 class="edu-title">4. Typosquatting & Homoglyph Lures</h3>
+            </div>
+            <p class="edu-text">
+                Attackers register lookalike domains designed to deceive the human eye:
+            </p>
+            <ul class="edu-bullets">
+                <li><strong>Typosquatting:</strong> Registering common misspellings (e.g., <code>goolge.com</code>, <code>paypa1.com</code>, <code>micros0ft.com</code>).</li>
+                <li><strong>Combosquatting:</strong> Adding security words to a brand (e.g., <code>netflix-security-update.com</code>).</li>
+                <li><strong>IDN Homoglyphs:</strong> Replacing Latin characters with visually identical Cyrillic or Greek letters (e.g., Cyrillic 'а' replacing Latin 'a'). Browsers display these internally as Punycode (<code>xn--...</code>).</li>
+            </ul>
+        </article>
+
+        <!-- Module 5 -->
+        <article class="edu-card">
+            <div class="edu-card-header">
+                <div class="edu-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h3 class="edu-title">5. Core Safe Browsing Principles</h3>
+            </div>
+            <ul class="edu-bullets">
+                <li><strong>Never Click Unsolicited Login Links:</strong> If your bank or service contacts you about an urgent issue, navigate to their website directly via bookmarks or known address.</li>
+                <li><strong>Inspect Link Destinations:</strong> Hover over hyperlinks on desktop to preview the real destination in your browser's bottom status bar before clicking.</li>
+                <li><strong>Enforce Hardware-Backed 2FA:</strong> Utilize FIDO2 / WebAuthn security keys or authenticator apps (TOTP) instead of SMS codes, which are susceptible to relay attacks.</li>
+                <li><strong>Use a Password Manager:</strong> Password managers will never autofill credentials into a fake domain, providing an automated defense against typosquats.</li>
+            </ul>
+        </article>
+
+        <!-- Module 6 -->
+        <article class="edu-card">
+            <div class="edu-card-header">
+                <div class="edu-icon-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </div>
+                <h3 class="edu-title">6. What to Do If You Clicked a Phishing Link</h3>
+            </div>
+            <p class="edu-text">
+                If you suspect you interacted with a fraudulent site, act immediately:
+            </p>
+            <ol class="edu-numbered-list">
+                <li><strong>Change Credentials Immediately:</strong> Change the password for the affected account on the official service website. If you reuse that password, change it everywhere else too.</li>
+                <li><strong>Revoke Active Sessions:</strong> Log into the official service and terminate all other active logged-in sessions and authorized app tokens.</li>
+                <li><strong>Notify Financial Institutions:</strong> If payment card or banking details were entered, call the card issuer immediately to freeze or replace the card.</li>
+                <li><strong>Report the Incident:</strong> Report the URL to PhishTank, Google Safe Browsing, and your IT security department.</li>
+            </ol>
+        </article>
+    </div>
+</div>
+{% endblock %}

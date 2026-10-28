@@ -1,0 +1,32 @@
+# Python byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environment
+venv/
+env/
+.venv/
+ENV/
+
+# Database files
+*.db
+test_*.db
+phishguard.db
+
+# Large raw datasets & model caches
+data/*.csv
+!data/README.md
+model/*.joblib
+!model/.gitkeep
+
+# Environment variables & secrets
+.env
+.env.local
+
+# IDE and OS files
+.DS_Store
+.vscode/
+.idea/
+*.swp

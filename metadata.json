@@ -1,0 +1,6 @@
+{
+  "name": "PhishGuard – AI Phishing URL Detector",
+  "description": "Professional cybersecurity application that analyzes URLs for phishing indicators, explains suspicious characteristics, and evaluates risk with transparent heuristic and machine learning indicators.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
